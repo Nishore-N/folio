@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 ## FOLIO
@@ -33,3 +34,6 @@ Same template with a slightly different flavor by shubh73: [devfolio](https://gi
 ## A note on re-sharing
 
 I have been refining the project using my learnings. While I appreciate the beauty of open source, due credits to the project will be appreciated if you plan to re-share the template. Copyright headers with author name should be included under the forked versions as well. Happy coding :)
+=======
+# Portfolio
+>>>>>>> 80d784dafa1098e0fafcf9b05e8db442bcf111a1
