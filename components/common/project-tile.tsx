@@ -18,6 +18,7 @@ const ProjectTile = ({
   animationEnabled: boolean;
 }) => {
   const projectCard: MutableRefObject<HTMLDivElement> = useRef(null);
+  const [showTechList, setShowTechList] = useState(false);
   const {
     name,
     tech,
@@ -102,8 +103,6 @@ const ProjectTile = ({
   );
 
   const renderTechnologies = (techStack: string[]): React.ReactNode => {
-    const [showTechList, setShowTechList] = useState(false);
-    
     return (
       <div className="relative mt-4 z-10" style={{ transform: "translateZ(1rem)" }}>
         <button
