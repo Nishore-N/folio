@@ -6,45 +6,62 @@
 
 import { MENULINKS, SKILLS } from "../../constants";
 import Image from "next/image";
-import { MutableRefObject, useEffect, useRef, useState } from "react";
+import React, { MutableRefObject, useEffect, useRef } from "react";
 import { gsap, Linear } from "gsap";
-import { ScrollTrigger } from "gsap/dist/ScrollTrigger";
 
 const SKILL_STYLES = {
   SECTION:
-    "w-full relative select-none mb-24 section-container py-12 flex flex-col justify-center",
+    "w-full relative select-none mb-0 section-container py-16 lg:py-24 flex flex-col justify-center",
   SKILL_TITLE: "section-title-sm mb-4 seq",
 };
 
 const SkillsSection = () => {
   const targetSection: MutableRefObject<HTMLDivElement> = useRef(null);
-  const [willChange, setwillChange] = useState(false);
-
-  const initRevealAnimation = (
-    targetSection: MutableRefObject<HTMLDivElement>
-  ): ScrollTrigger => {
-    const revealTl = gsap.timeline({ defaults: { ease: Linear.easeNone } });
-    revealTl.from(
-      targetSection.current.querySelectorAll(".seq"),
-      { opacity: 0, duration: 0.5, stagger: 0.5 },
-      "<"
-    );
-
-    return ScrollTrigger.create({
-      trigger: targetSection.current.querySelector(".skills-wrapper"),
-      start: "100px bottom",
-      end: `center center`,
-      animation: revealTl,
-      scrub: 0,
-      onToggle: (self) => setwillChange(self.isActive),
-    });
-  };
 
   useEffect(() => {
-    const revealAnimationRef = initRevealAnimation(targetSection);
+    let animationFrameId: number;
+    const revealTl = gsap.timeline({ paused: true, defaults: { ease: Linear.easeNone } });
 
-    return revealAnimationRef.kill;
-  }, [targetSection]);
+    if (targetSection.current) {
+      revealTl.from(
+        targetSection.current.querySelectorAll(".seq"),
+        { opacity: 0, duration: 0.5, stagger: 0.5 }
+      );
+    }
+
+    const handleScroll = () => {
+      if (!targetSection.current) return;
+      const windowHeight = window.innerHeight;
+      
+      const startPoint = windowHeight - 100;
+      const endPoint = windowHeight / 2;
+      
+      const wrapper = targetSection.current.querySelector(".skills-wrapper");
+      if (!wrapper) return;
+      const wrapperRect = wrapper.getBoundingClientRect();
+      
+      let progress = (startPoint - wrapperRect.top) / (startPoint - endPoint);
+      progress = Math.max(0, Math.min(1, progress));
+      
+      gsap.to(revealTl, { progress: progress, duration: 0.5, ease: "power2.out", overwrite: "auto" });
+    };
+
+    const onScroll = () => {
+      animationFrameId = requestAnimationFrame(handleScroll);
+    };
+
+    window.addEventListener("scroll", onScroll);
+    handleScroll();
+
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      cancelAnimationFrame(animationFrameId);
+      revealTl.kill();
+      if (targetSection.current) {
+        gsap.set(targetSection.current.querySelectorAll(".seq"), { clearProps: "all" });
+      }
+    };
+  }, []);
 
   const renderSectionTitle = (): React.ReactNode => (
     <div className="flex flex-col">
@@ -85,13 +102,8 @@ const SkillsSection = () => {
   ): React.ReactNode => (
     <>
       <h3 className={SKILL_STYLES.SKILL_TITLE}>{title}</h3>
-      <div
-        className={`flex flex-wrap seq ${
-          willChange ? "will-change-opacity" : ""
-        }`}
-      >
+      <div className="flex flex-wrap seq">
         {skills.map((skill) => {
-          // Determine image extension based on skill name
           let imageSrc = `/skills/${skill}.svg`;
           if (skill === 'flutter') imageSrc = '/skills/Flutter.png';
           if (skill === 'canva') imageSrc = '/skills/Canva.jpeg';

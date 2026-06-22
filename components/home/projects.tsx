@@ -13,7 +13,7 @@ import { IDesktop, NO_MOTION_PREFERENCE_QUERY } from "pages";
 
 const PROJECT_STYLES = {
   SECTION:
-    "w-full relative select-none section-container flex-col flex py-8 justify-center",
+    "w-full relative select-none section-container flex-col flex pb-8 pt-20 lg:pt-24 justify-center",
   PROJECTS_WRAPPER:
     "tall:mt-12 mt-6 grid grid-flow-col auto-cols-max md:gap-10 gap-6 project-wrapper w-fit seq snap-x scroll-pl-6 snap-mandatory",
 };
@@ -22,30 +22,9 @@ const ProjectsSection = ({ isDesktop }: IDesktop) => {
   const targetSectionRef: MutableRefObject<HTMLDivElement> = useRef(null);
   const sectionTitleElementRef: MutableRefObject<HTMLDivElement> = useRef(null);
 
-  const [willChange, setwillChange] = useState(false);
   const [horizontalAnimationEnabled, sethorizontalAnimationEnabled] =
     useState(false);
 
-  const initRevealAnimation = (
-    targetSectionRef: MutableRefObject<HTMLDivElement>
-  ): [GSAPTimeline, ScrollTrigger] => {
-    const revealTl = gsap.timeline({ defaults: { ease: Linear.easeNone } });
-    revealTl.from(
-      targetSectionRef.current.querySelectorAll(".seq"),
-      { opacity: 0, duration: 0.5, stagger: 0.5 },
-      "<"
-    );
-
-    const scrollTrigger = ScrollTrigger.create({
-      trigger: targetSectionRef.current,
-      start: "top bottom",
-      end: "bottom bottom",
-      scrub: 0,
-      animation: revealTl,
-    });
-
-    return [revealTl, scrollTrigger];
-  };
 
   const initProjectsAnimation = (
     targetSectionRef: MutableRefObject<HTMLDivElement>,
@@ -73,7 +52,6 @@ const ProjectsSection = ({ isDesktop }: IDesktop) => {
       pin: true,
       animation: timeline,
       pinSpacing: "margin",
-      onToggle: (self) => setwillChange(self.isActive),
     });
 
     return [timeline, scrollTrigger];
@@ -82,50 +60,69 @@ const ProjectsSection = ({ isDesktop }: IDesktop) => {
   useEffect(() => {
     let projectsScrollTrigger: ScrollTrigger | undefined;
     let projectsTimeline: GSAPTimeline | undefined;
+    let initTimer: NodeJS.Timeout;
 
     const { matches } = window.matchMedia(NO_MOTION_PREFERENCE_QUERY);
-
     sethorizontalAnimationEnabled(isDesktop && matches);
 
-    if (isDesktop && matches) {
-      [projectsTimeline, projectsScrollTrigger] = initProjectsAnimation(
-        targetSectionRef,
-        sectionTitleElementRef
-      );
-    } else {
-      const projectWrapper = targetSectionRef.current.querySelector(
-        ".project-wrapper"
-      ) as HTMLDivElement;
-      const parentPadding = window
-        .getComputedStyle(targetSectionRef.current)
-        .getPropertyValue("padding-left");
+    // Wrap initialization in a timeout to guarantee the DOM has settled
+    // after any previous Strict Mode cleanup wiped the inline styles.
+    initTimer = setTimeout(() => {
+      if (isDesktop && matches) {
+        if (targetSectionRef.current && sectionTitleElementRef.current) {
+          [projectsTimeline, projectsScrollTrigger] = initProjectsAnimation(
+            targetSectionRef,
+            sectionTitleElementRef
+          );
+          // Force GSAP to recognize the new pinned heights
+          ScrollTrigger.refresh();
+        }
+      } else {
+        if (targetSectionRef.current) {
+          const projectWrapper = targetSectionRef.current.querySelector(
+            ".project-wrapper"
+          ) as HTMLDivElement;
+          const parentPadding = window
+            .getComputedStyle(targetSectionRef.current)
+            .getPropertyValue("padding-left");
 
-      targetSectionRef.current.style.setProperty("width", "100%");
-      projectWrapper.classList.add("overflow-x-auto");
-      projectWrapper.style.setProperty("width", `calc(100vw)`);
-      projectWrapper.style.setProperty("padding", `0 ${parentPadding}`);
-      projectWrapper.style.setProperty(
-        "transform",
-        `translateX(-${parentPadding})`
-      );
-    }
-
-    const [revealTimeline, revealScrollTrigger] =
-      initRevealAnimation(targetSectionRef);
+          targetSectionRef.current.style.setProperty("width", "100%");
+          if (projectWrapper) {
+            projectWrapper.classList.add("overflow-x-auto");
+            projectWrapper.style.setProperty("width", `calc(100vw)`);
+            projectWrapper.style.setProperty("padding", `0 ${parentPadding}`);
+            projectWrapper.style.setProperty(
+              "transform",
+              `translateX(-${parentPadding})`
+            );
+          }
+        }
+      }
+    }, 100);
 
     return () => {
+      clearTimeout(initTimer);
       projectsScrollTrigger && projectsScrollTrigger.kill();
       projectsTimeline && projectsTimeline.kill();
-      revealScrollTrigger && revealScrollTrigger.kill();
-      revealTimeline && revealTimeline.progress(1);
+      
+      // CRITICAL: Strip all inline styles left by GSAP and manual logic 
+      if (targetSectionRef.current) {
+        gsap.set(targetSectionRef.current, { clearProps: "all" });
+        const projectWrapper = targetSectionRef.current.querySelector(".project-wrapper") as HTMLDivElement;
+        if (projectWrapper) {
+          gsap.set(projectWrapper, { clearProps: "all" });
+          projectWrapper.classList.remove("overflow-x-auto");
+        }
+      }
+      if (sectionTitleElementRef.current) {
+        gsap.set(sectionTitleElementRef.current, { clearProps: "all" });
+      }
     };
   }, [targetSectionRef, sectionTitleElementRef, isDesktop]);
 
   const renderSectionTitle = (): React.ReactNode => (
     <div
-      className={`flex flex-col inner-container  ${
-        willChange ? "will-change-transform" : ""
-      }`}
+      className="flex flex-col inner-container"
       ref={sectionTitleElementRef}
     >
       <p className="section-title-sm seq">PROJECTS</p>
@@ -150,7 +147,7 @@ const ProjectsSection = ({ isDesktop }: IDesktop) => {
   return (
     <section
       ref={targetSectionRef}
-      className={`${isDesktop && "min-h-screen"} ${PROJECT_STYLES.SECTION}`}
+      className={`${isDesktop ? "min-h-screen" : ""} ${PROJECT_STYLES.SECTION}`}
       id={projectsSectionRef}
     >
       {renderSectionTitle()}

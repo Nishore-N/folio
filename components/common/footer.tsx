@@ -7,8 +7,16 @@
 import { EMAIL, MENULINKS, SOCIAL_LINKS } from "../../constants";
 import Image from "next/image";
 import Button, { ButtonTypes } from "./button";
+import { useState } from "react";
 
 const Footer = () => {
+  const images = ["/Portfolio1.jpeg", "/Portfolio2.jpeg"];
+  const [currentIdx, setCurrentIdx] = useState(0);
+
+  const handleBadgeClick = () => {
+    setCurrentIdx((prev) => (prev + 1) % images.length);
+  };
+
   const renderSocialIcons = (): React.ReactNode => {
     return Object.keys(SOCIAL_LINKS).map((el: keyof typeof SOCIAL_LINKS) => (
       <a
@@ -25,6 +33,34 @@ const Footer = () => {
 
   const renderFooterContent = (): React.ReactNode => (
     <>
+      {/* Modern Profile Badge with Click/Hover-to-Slide */}
+      <div 
+        onClick={handleBadgeClick}
+        onMouseEnter={() => setCurrentIdx(1)}
+        onMouseLeave={() => setCurrentIdx(0)}
+        className="relative w-32 h-32 md:w-40 md:h-40 mb-6 md:mb-8 mx-auto rounded-full p-1 bg-gradient-to-tr from-[#6dd5ed] to-[#2193b0] shadow-[0_0_20px_rgba(109,213,237,0.3)] hover:shadow-[0_0_30px_rgba(109,213,237,0.6)] transition-all duration-500 hover:scale-105 hover:-translate-y-1 cursor-pointer"
+        title="Hover or Click to view more"
+      >
+        <div className="w-full h-full rounded-full overflow-hidden border-4 border-gray-900 relative bg-gray-800">
+          <div 
+            className="flex w-full h-full transition-transform duration-500 ease-in-out"
+            style={{ transform: `translateX(-${currentIdx * 100}%)` }}
+          >
+            {images.map((src, idx) => (
+              <img
+                key={idx}
+                src={src}
+                alt={`NISHORE N Profile ${idx + 1}`}
+                className="w-full h-full object-cover object-center scale-105 flex-shrink-0"
+              />
+            ))}
+          </div>
+        </div>
+        {/* Decorative elements */}
+        <div className="absolute top-2 -right-1 w-5 h-5 bg-[#6dd5ed] rounded-full border-4 border-gray-900 animate-bounce"></div>
+        <div className="absolute -bottom-1 left-4 w-4 h-4 bg-[#2193b0] rounded-full border-2 border-gray-900 animate-pulse"></div>
+      </div>
+
       <h1 className="font-medium text-3xl md:text-4xl text-center">
         Connect with me on social media.
       </h1>
@@ -44,10 +80,15 @@ const Footer = () => {
           classes="ml-3"
           type={ButtonTypes.WHITE}
           name="Let's Talk"
-          href={SOCIAL_LINKS.linkedin}
-          otherProps={{
-            target: "_blank",
-            rel: "noreferrer",
+          href="#contact"
+          onClick={(e: React.MouseEvent<HTMLAnchorElement>) => {
+            e.preventDefault();
+            const el = document.getElementById("contact");
+            if (!el) return;
+            const top = el.getBoundingClientRect().top + window.scrollY;
+            window.scrollTo({ top, behavior: "instant" as ScrollBehavior });
+            el.classList.add("contact-highlight");
+            setTimeout(() => el.classList.remove("contact-highlight"), 1200);
           }}
         ></Button>
       </div>

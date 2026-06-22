@@ -6,9 +6,15 @@
 
 import "../styles/globals.scss";
 import type { AppProps } from "next/app";
+import SplashScreen from "@/components/common/splash-screen";
 
 function MyApp({ Component, pageProps }: AppProps) {
-  return <Component {...pageProps} />;
+  return (
+    <>
+      <SplashScreen />
+      <Component {...pageProps} />
+    </>
+  );
 }
 
 export default MyApp;

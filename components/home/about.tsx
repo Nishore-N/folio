@@ -4,86 +4,90 @@
 // This file is licensed under the MIT License.
 // License text available at https://opensource.org/licenses/MIT
 
-import { gsap, Linear } from "gsap";
-import React, { MutableRefObject, useEffect, useRef, useState } from "react";
-import { ScrollTrigger } from "gsap/dist/ScrollTrigger";
+import { gsap } from "gsap";
+import React, { MutableRefObject, useEffect, useRef } from "react";
 
 const AboutSection = () => {
   const quoteRef: MutableRefObject<HTMLDivElement> = useRef(null);
   const targetSection: MutableRefObject<HTMLDivElement> = useRef(null);
 
-  const [willChange, setwillChange] = useState(false);
-
-  const initAboutAnimation = (
-    quoteRef: MutableRefObject<HTMLDivElement>,
-    targetSection: MutableRefObject<HTMLDivElement>
-  ): ScrollTrigger => {
-    const timeline = gsap.timeline({
-      defaults: { ease: Linear.easeNone, duration: 0.1 },
-    });
-    timeline
-      .fromTo(
-        quoteRef.current.querySelector(".about-1"),
-        { opacity: 0.2 },
-        { opacity: 1 }
-      )
-      .to(quoteRef.current.querySelector(".about-1"), {
-        opacity: 0.2,
-        delay: 0.5,
-      })
-      .fromTo(
-        quoteRef.current.querySelector(".about-2"),
-        { opacity: 0.2 },
-        { opacity: 1 },
-        "<"
-      )
-      .to(quoteRef.current.querySelector(".about-2"), {
-        opacity: 0.2,
-        delay: 1,
-      });
-
-    const scrollTriggerInstance = ScrollTrigger.create({
-      trigger: targetSection.current,
-      start: "center 80%",
-      end: "center top",
-      scrub: 0,
-      animation: timeline,
-      onToggle: (self) => setwillChange(self.isActive),
-    });
-    return scrollTriggerInstance;
-  };
-
   useEffect(() => {
-    const aboutScrollTriggerInstance = initAboutAnimation(
-      quoteRef,
-      targetSection
-    );
+    let animationFrameId: number;
+    let timeline = gsap.timeline({
+      paused: true,
+      defaults: { ease: "none", duration: 0.1 },
+    });
 
-    return aboutScrollTriggerInstance.kill;
-  }, [quoteRef, targetSection]);
+    if (quoteRef.current) {
+      timeline
+        .fromTo(
+          quoteRef.current.querySelector(".about-1"),
+          { opacity: 0.2 },
+          { opacity: 1 }
+        )
+        .to(quoteRef.current.querySelector(".about-1"), {
+          opacity: 0.2,
+          delay: 0.5,
+        })
+        .fromTo(
+          quoteRef.current.querySelector(".about-2"),
+          { opacity: 0.2 },
+          { opacity: 1 },
+          "<"
+        )
+        .to(quoteRef.current.querySelector(".about-2"), {
+          opacity: 0.2,
+          delay: 1,
+        });
+    }
+
+    const handleScroll = () => {
+      if (!targetSection.current) return;
+      const rect = targetSection.current.getBoundingClientRect();
+      const windowHeight = window.innerHeight;
+      
+      const sectionCenter = rect.top + rect.height / 2;
+      const startPoint = windowHeight * 0.8;
+      const endPoint = 0;
+      
+      let progress = (startPoint - sectionCenter) / (startPoint - endPoint);
+      progress = Math.max(0, Math.min(1, progress));
+      
+      // Use gsap.to to smoothly scrub the timeline instead of raw jump
+      gsap.to(timeline, { progress: progress, duration: 0.5, ease: "power2.out", overwrite: "auto" });
+    };
+
+    const onScroll = () => {
+      animationFrameId = requestAnimationFrame(handleScroll);
+    };
+
+    window.addEventListener("scroll", onScroll);
+    handleScroll();
+
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      cancelAnimationFrame(animationFrameId);
+      timeline.kill();
+      if (quoteRef.current) {
+        gsap.set(quoteRef.current.querySelectorAll(".about-1, .about-2"), { clearProps: "all" });
+      }
+    };
+  }, []);
 
   const renderQuotes = (): React.ReactNode => (
     <h1 ref={quoteRef} className="font-medium text-3xl sm:text-4xl md:text-6xl">
-      <span
-        className={`about-1 leading-tight ${
-          willChange ? "will-change-opacity" : ""
-        }`}
-      >
-        I am a passionate Information Technology graduate seeking entry-level positions in software industry.{" "}
+      <span className="about-1 leading-tight">
+        I am a Software Developer experienced in building scalable mobile and Full stack applications.{" "}
       </span>
-      <span
-        className={`about-2 leading-tight ${
-          willChange ? "will-change-opacity" : ""
-        }`}
-      >
-        I am eager to apply my academic knowledge and strong work ethic to a challenging and rewarding role.
+      <span className="about-2 leading-tight">
+        As a tech-agnostic developer, I leverage AI to rapidly master new technologies and seamlessly adapt to the ever-evolving demands of the modern tech arena.
       </span>
     </h1>
   );
 
   return (
     <section
-      className={`tall:pt-20 tall:pb-16 pt-40 pb-24 w-full relative select-none section-container`}
+      className="tall:pt-20 tall:pb-16 pt-40 pb-24 w-full relative select-none section-container"
       ref={targetSection}
     >
       {renderQuotes()}

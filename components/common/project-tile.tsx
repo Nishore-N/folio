@@ -27,6 +27,7 @@ const ProjectTile = ({
     description,
     gradient: [stop1, stop2],
     category,
+    url,
   } = project;
 
   useEffect(() => {
@@ -80,9 +81,9 @@ const ProjectTile = ({
   );
 
   const renderCategoryLabel = (category: string): React.ReactNode => (
-    <div className="absolute top-4 right-4 z-20">
+    <div className="z-20 pl-2 mt-3">
       <span
-        className={`px-4 py-2 rounded-full text-xs font-semibold uppercase tracking-wide border-2 transition-all duration-300 ease-in-out ${
+        className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider border transition-all duration-300 ease-in-out ${
           category === "hardware" 
             ? "bg-orange-500 bg-opacity-90 text-white border-orange-400" 
             : "bg-blue-500 bg-opacity-90 text-white border-blue-400"
@@ -95,7 +96,7 @@ const ProjectTile = ({
 
   const renderProjectName = (name: string): React.ReactNode => (
     <h1
-      className="text-2xl sm:text-3xl z-10 pl-2 mb-4 pr-24"
+      className="text-2xl sm:text-3xl font-bold z-10 pl-2 leading-tight"
       style={{ transform: "translateZ(3rem)" }}
     >
       {name}
@@ -136,6 +137,23 @@ const ProjectTile = ({
     );
   };
 
+  const renderLinks = (url: string): React.ReactNode => {
+    if (!url || url === "#") return null;
+    return (
+      <div className="relative mt-4 z-10" style={{ transform: "translateZ(1rem)" }}>
+        <a
+          href={url}
+          target="_blank"
+          rel="noreferrer"
+          className="link cursor-none px-4 py-2 bg-white bg-opacity-20 rounded-lg text-sm font-medium text-white backdrop-blur-sm hover:bg-opacity-30 transition-all duration-200 border border-white/10 flex items-center gap-2"
+        >
+          <span>Live preview</span>
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
+        </a>
+      </div>
+    );
+  };
+
   const renderTopBottomGradient = (gradient: string): React.ReactNode => (
     <>
       <div
@@ -170,7 +188,7 @@ const ProjectTile = ({
 
   return (
     <div
-      className="overflow-hidden rounded-3xl snap-start"
+      className="overflow-hidden rounded-3xl snap-start h-full"
       style={{
         maxWidth: animationEnabled
           ? "calc(100vw - 2rem)"
@@ -183,7 +201,7 @@ const ProjectTile = ({
         ref={projectCard}
         className={`
           ${styles.ProjectTile}
-           rounded-3xl relative p-6 flex-col flex justify-between max-w-full
+           h-full rounded-3xl relative p-6 flex-col flex justify-between max-w-full
            transition-all duration-500 ease-in-out hover:scale-105 hover:shadow-2xl
         `}
         style={{
@@ -197,10 +215,15 @@ const ProjectTile = ({
           className="absolute w-full h-full top-0 left-0 opacity-20"
         />
         {renderTopBottomGradient(stop1)}
-        {renderCategoryLabel(category)}
-        {renderProjectName(name)}
+        <div className="flex flex-col mb-4">
+          {renderProjectName(name)}
+          {renderCategoryLabel(category)}
+        </div>
         {renderDescription(description)}
-        {renderTechnologies(tech)}
+        <div className="flex items-center justify-between w-full">
+          {renderTechnologies(tech)}
+          {renderLinks(url)}
+        </div>
       </div>
     </div>
   );

@@ -22,11 +22,11 @@ const Button = ({
   otherProps,
 }: {
   type: ButtonTypes;
-  onClick?: () => void;
+  onClick?: (e: React.MouseEvent<HTMLAnchorElement>) => void;
   name: string;
   href: string;
   classes?: string;
-  otherProps?: Record<string, string>;
+  otherProps?: any;
 }) => {
   const buttonClasses =
     "py-2 px-7 font-medium rounded text-base md:text-xl tracking-wide link duration-300 flex items-center";

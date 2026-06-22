@@ -34,7 +34,9 @@ body {
 }
 
 html {
-  scroll-behavior: smooth;
+  // Use 'auto' so programmatic instant jumps (e.g. Let's Talk) are not
+  // overridden by the browser's own smooth-scroll engine.
+  scroll-behavior: auto;
   overflow-x: hidden;
 
   @media (min-width: 768px) {
@@ -217,8 +219,10 @@ a {
     #2193b0 100%
   );
   background-size: 200% 100%;
+  background-position: 0% 0%;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 .project-wrapper::-webkit-scrollbar {
@@ -247,4 +251,17 @@ footer {
 
 .section-title-sm {
   @apply uppercase tracking-widest text-gray-200 text-sm;
+}
+
+// Pulse highlight when jumping directly to the contact section
+@keyframes contact-pulse {
+  0%   { box-shadow: 0 0 0 0 rgba(33, 147, 176, 0); }
+  30%  { box-shadow: 0 0 0 12px rgba(33, 147, 176, 0.35); }
+  70%  { box-shadow: 0 0 0 24px rgba(109, 213, 237, 0.15); }
+  100% { box-shadow: 0 0 0 0 rgba(109, 213, 237, 0); }
+}
+
+.contact-highlight {
+  animation: contact-pulse 1.2s ease-out forwards;
+  border-radius: 1.5rem;
 }

@@ -10,8 +10,8 @@ import { gsap, Linear } from "gsap";
 import { IDesktop, isSmallScreen } from "pages";
 
 const CURSOR_STYLES = {
-  CURSOR: "fixed hidden bg-white w-4 h-4 select-none pointer-events-none z-50",
-  FOLLOWER: "fixed hidden h-8 w-8 select-none pointer-events-none z-50",
+  CURSOR: "fixed hidden bg-white w-4 h-4 select-none pointer-events-none z-[10000]",
+  FOLLOWER: "fixed hidden h-8 w-8 select-none pointer-events-none z-[10000]",
 };
 
 const Cursor = ({ isDesktop }: IDesktop) => {
@@ -61,9 +61,16 @@ const Cursor = ({ isDesktop }: IDesktop) => {
 
     document.addEventListener("mousemove", moveCircle);
 
-    document.querySelectorAll(".link").forEach((el) => {
-      el.addEventListener("mouseenter", onHover);
-      el.addEventListener("mouseleave", onUnhover);
+    document.addEventListener("mouseover", (e) => {
+      if ((e.target as HTMLElement).closest(".link")) {
+        onHover();
+      }
+    });
+
+    document.addEventListener("mouseout", (e) => {
+      if ((e.target as HTMLElement).closest(".link")) {
+        onUnhover();
+      }
     });
   };
 

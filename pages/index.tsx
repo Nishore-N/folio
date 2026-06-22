@@ -20,10 +20,12 @@ import ProjectsSection from "@/components/home/projects";
 import QuoteSection from "@/components/home/quote";
 import SkillsSection from "@/components/home/skills";
 import CollaborationSection from "@/components/home/collaboration";
+import ContactSection from "@/components/home/contact";
 import Footer from "@/components/common/footer";
 import TimelineSection from "@/components/home/timeline";
 import Scripts from "@/components/common/scripts";
 import AboutSection from "@/components/home/about";
+import ExitIntentPopup from "@/components/common/exit-intent-popup";
 
 const DEBOUNCE_TIME = 100;
 
@@ -86,9 +88,11 @@ export default function Home() {
           <SkillsSection />
           <TimelineSection isDesktop={isDesktop} />
           <CollaborationSection />
+          <ContactSection />
           <Footer />
         </main>
         <Scripts />
+        <ExitIntentPopup />
       </Layout>
     </>
   );

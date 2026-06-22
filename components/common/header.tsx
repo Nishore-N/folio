@@ -12,15 +12,20 @@ const Header = () => {
   const [menuVisible, setmenuVisible] = useState(false);
 
   return (
-    <header className="w-full fixed top-0 py-8 select-none z-50 bg-gradient-to-b from-gray-900 to-transparent">
-      <div className="flex justify-between section-container">
-        <a href="#home" className="link">
+    <header className="w-full fixed top-0 select-none z-50">
+      <div className="absolute inset-0 bg-gray-900/80 backdrop-blur-md shadow-sm -z-10"></div>
+      <div className="flex justify-between section-container py-6">
+        <a href="#home" className="link flex items-center gap-3 group">
           <Image
             src="/logo.svg"
             alt="Logo - NISHORE N"
             width={22}
             height={22}
+            className="group-hover:scale-110 transition-transform duration-300"
           />
+          <span className="font-semibold text-sm tracking-[0.25em] text-white opacity-90 group-hover:opacity-100 transition-opacity duration-300 mt-1">
+            FOLIO<span className="text-[#6dd5ed]">.</span>
+          </span>
         </a>
         <nav className={`outer-menu ${menuVisible ? "menu-visible" : ""}`}>
           <button

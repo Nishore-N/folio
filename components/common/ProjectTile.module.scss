@@ -5,14 +5,15 @@
 // License text available at https://opensource.org/licenses/MIT
 
 .ProjectTile {
-  height: 22rem;
+  min-height: 22rem;
+  height: 100%;
   width: 38rem;
   background: black;
   transform-style: preserve-3d;
   transform: perspective(1000px);
 
-  @media (min-width: 768px) {
-    height: 26rem;
+  @media (min-width: 768px) and (min-height: 800px) {
+    min-height: 26rem;
   }
 
   img {
@@ -21,7 +22,10 @@
 }
 
 .ProjectImg {
-  @apply absolute top-0 rounded-xl shadow-xl;
+  position: absolute;
+  top: 0;
+  border-radius: 0.75rem;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
 
   width: 16.8rem !important;
   transform: rotate(-22.5deg);
