@@ -64,7 +64,7 @@ const ExitIntentPopup = () => {
     setStatusMessage("");
 
     try {
-      const res = await fetch("/api/send-email", {
+      const res = await fetch("https://portfolio-backend-zuq3.onrender.com/api/send-email", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -125,10 +125,10 @@ const ExitIntentPopup = () => {
           </svg>
         </button>
         <h2 className="text-3xl md:text-5xl font-bold mb-6 tracking-wider leading-tight text-gradient">
-          Let's Build Something<br />Amazing Together
+          Let&apos;s Build Something<br />Amazing Together
         </h2>
         <p className="text-gray-400 text-base md:text-lg mb-10 max-w-xl mx-auto leading-relaxed">
-          Drop your email below and I'll get back to you, or feel free to reach out directly to discuss potential collaborations.
+          Drop your email below and I&apos;ll get back to you, or feel free to reach out directly to discuss potential collaborations.
         </p>
         <form
           className="flex flex-col sm:flex-row items-center bg-[#1a1a1a] rounded-full p-2 mb-4 w-full max-w-lg mx-auto border border-gray-800"
@@ -172,7 +172,7 @@ const ExitIntentPopup = () => {
           </p>
         )}
         <p className="text-gray-600 text-xs tracking-[0.2em] uppercase font-semibold">
-          I'll get back to you within 24 hours.
+          I&apos;ll get back to you within 24 hours.
         </p>
       </div>
     </div>

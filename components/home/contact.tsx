@@ -24,7 +24,7 @@ const ContactSection = () => {
     setStatusMessage("");
 
     try {
-      const res = await fetch("/api/send-email", {
+      const res = await fetch("https://portfolio-backend-zuq3.onrender.com/api/send-email", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name, email, phone, message }),
